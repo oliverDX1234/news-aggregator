@@ -11,8 +11,9 @@ lerna-debug.log*
 /frontend/node_modules
 /backend/node_modules
 /vendor
+/dist
 
-# Build and storage directories
+# Build and storage     rectories
 /public/build
 /public/hot
 /public/storage
