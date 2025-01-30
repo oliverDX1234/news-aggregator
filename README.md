@@ -164,7 +164,23 @@ $ docker exec -it mysql_container mysql -u user -p
 
 Password: `password`
 
-### 8. Stopping the Containers
+### 7. Logging in
+
+Default database credentials are seeded
+
+username: user@gmail.com
+password: pass123.
+
+Feel free to register and create new user.
+
+```sh
+$ docker exec -it mysql_container mysql -u user -p
+```
+
+Password: `password`
+
+
+### 9. Stopping the Containers
 
 To stop the application without removing containers:
 
@@ -180,7 +196,7 @@ $ docker-compose down
 
 This will **not** remove database volumes.
 
-### 9. Removing Database Volumes (Reset Database)
+### 10. Removing Database Volumes (Reset Database)
 
 If you want to **delete all database data**, run:
 
