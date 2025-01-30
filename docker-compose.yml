@@ -43,17 +43,9 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/var/www/html
-      - ./backend/.env:/var/www/html/.env
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=news_aggregator
-      - DB_USERNAME=user
-      - DB_PASSWORD=password
 
   webserver:
     image: nginx:alpine
@@ -73,13 +65,6 @@ services:
     container_name: laravel_scheduler
     volumes:
       - ./backend:/var/www/html
-    environment:
-      DB_CONNECTION: mysql
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: news_aggregator
-      DB_USERNAME: user
-      DB_PASSWORD: password
     depends_on:
       - db
     command: ["sh", "-c", "while :; do php artisan schedule:run >> /dev/null 2>&1; sleep 60; done"]
