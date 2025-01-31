@@ -14,9 +14,9 @@ class SourceSeeder extends Seeder
     public function run()
     {
 
-        $newsAPI = Source::create(['name' => 'NewsAPI', 'base_url' => 'https://newsapi.org/v2', 'api_key' => env('NEWSAPI_KEY')]);
-        $guardian = Source::create(['name' => 'The Guardian', 'base_url' => 'https://content.guardianapis.com', 'api_key' => env('GUARDIAN_API_KEY')]);
-        $nytimes = Source::create(['name' => 'NY Times', 'base_url' => 'https://api.nytimes.com/svc', 'api_key' => env('NYTIMES_API_KEY')]);
+        $newsAPI = Source::firstOrCreate(['name' => 'NewsAPI', 'base_url' => 'https://newsapi.org/v2', 'api_key' => env('NEWSAPI_KEY')]);
+        $guardian = Source::firstOrCreate(['name' => 'The Guardian', 'base_url' => 'https://content.guardianapis.com', 'api_key' => env('GUARDIAN_API_KEY')]);
+        $nytimes = Source::firstOrCreate(['name' => 'NY Times', 'base_url' => 'https://api.nytimes.com/svc', 'api_key' => env('NYTIMES_API_KEY')]);
 
         $newsAPI->categories()->attach(Category::all()->pluck('id')->toArray());
 
