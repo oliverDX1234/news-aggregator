@@ -47,37 +47,69 @@ class ScrapeArticles extends Command
         }
 
         logger()->info("Scraping completed successfully!");
-
         $this->info('Scraping completed successfully!');
     }
 
     private function fetchFromNewsAPI($source, $category)
     {
-        $response = Http::get("{$source->base_url}/everything", [
-            'q' => $category->value,
-            'apiKey' => $source->api_key,
-        ]);
+        try {
+            $response = Http::timeout(10)->get("{$source->base_url}/everything", [
+                'q' => $category->value,
+                'apiKey' => $source->api_key,
+            ]);
 
-        return $response->successful() ? $response->json('articles') : [];
+            if ($response->successful()) {
+                return $response->json('articles');
+            }
+
+            $this->error("NewsAPI request failed: " . $response->status());
+            return [];
+        } catch (\Exception $e) {
+            $this->error("Error fetching NewsAPI: " . $e->getMessage());
+            logger()->error("NewsAPI Error: " . $e->getMessage());
+            return [];
+        }
     }
 
     private function fetchFromGuardian($source, $category)
     {
-        $response = Http::get("{$source->base_url}/search", [
-            'section' => $category->value,
-            'api-key' => $source->api_key,
-        ]);
+        try {
+            $response = Http::timeout(10)->get("{$source->base_url}/search", [
+                'section' => $category->value,
+                'api-key' => $source->api_key,
+            ]);
 
-        return $response->successful() ? $response->json('response.results') : [];
+            if ($response->successful()) {
+                return $response->json('response.results');
+            }
+
+            $this->error("Guardian API request failed: " . $response->status());
+            return [];
+        } catch (\Exception $e) {
+            $this->error("Error fetching Guardian API: " . $e->getMessage());
+            logger()->error("Guardian API Error: " . $e->getMessage());
+            return [];
+        }
     }
 
     private function fetchFromNYTimes($source, $category)
     {
-        $response = Http::get("{$source->base_url}/topstories/v2/{$category->value}.json", [
-            'api-key' => $source->api_key,
-        ]);
+        try {
+            $response = Http::timeout(10)->get("{$source->base_url}/topstories/v2/{$category->value}.json", [
+                'api-key' => $source->api_key,
+            ]);
 
-        return $response->successful() ? $response->json('results') : [];
+            if ($response->successful()) {
+                return $response->json('results');
+            }
+
+            $this->error("NY Times API request failed: " . $response->status());
+            return [];
+        } catch (\Exception $e) {
+            $this->error("Error fetching NY Times API: " . $e->getMessage());
+            logger()->error("NY Times API Error: " . $e->getMessage());
+            return [];
+        }
     }
 
     private function saveArticles($articles, $sourceId, $categoryId)
@@ -90,8 +122,6 @@ class ScrapeArticles extends Command
                 $this->error("Article skipped due to missing URL in source ID {$sourceId}.");
                 continue;
             }
-
-            $image = $article['urlToImage'] ?? $this->extractImageUrl($article) ?? null;
 
             $authorName = $article['author'] ?? $article['byline'] ?? $article['byline']['original'] ?? null;
             $author = null;
@@ -125,18 +155,5 @@ class ScrapeArticles extends Command
         } catch (\Exception $e) {
             return null;
         }
-    }
-
-    private function extractImageUrl($article)
-    {
-        if (isset($article['multimedia']) && is_array($article['multimedia'])) {
-            foreach ($article['multimedia'] as $media) {
-                if (isset($media['url']) && $media['format'] === 'Super Jumbo') {
-                    return $media['url'];
-                }
-            }
-        }
-
-        return null;
     }
 }
