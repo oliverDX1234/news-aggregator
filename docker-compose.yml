@@ -46,6 +46,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    environment:
+      - CONTAINER_ROLE=laravel_backend
 
   webserver:
     image: nginx:alpine
@@ -66,7 +68,10 @@ services:
     volumes:
       - ./backend:/var/www/html
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
     command: ["sh", "-c", "while :; do php artisan schedule:run >> /dev/null 2>&1; sleep 60; done"]
 
 volumes:
